@@ -5,8 +5,17 @@ let green = sprites.create(assets.image`green player`, SpriteKind.Enemy)
 sprites.setDataImage(red, "tile", assets.tile`red`)
 sprites.setDataImage(blue, "tile", assets.tile`blue`)
 sprites.setDataImage(green, "tile", assets.tile`green`)
+// 
+sprites.setDataNumber(red, "colour", 3)
+sprites.setDataNumber(blue, "colour", 6)
+sprites.setDataNumber(green, "colour", 9)
+// 
 //  variables
 let opponent_speed = 75
+// 
+let last_vx = 100
+let last_vy = 0
+// 
 //  setup
 info.startCountdown(120)
 controller.moveSprite(red)
@@ -20,7 +29,7 @@ function setup_map() {
         tiles.placeOnRandomTile(opponent, assets.tile`spawn`)
         tile_image = sprites.readDataImage(opponent, "tile")
         tiles.setTileAt(opponent.tilemapLocation(), tile_image)
-        change_opponent_dir(opponent)
+        change_opponent_dir(blue)
     }
 }
 
@@ -36,6 +45,35 @@ info.onCountdownEnd(function time_up() {
     }
     
 })
+// 
+function fire(sprite: Sprite): Sprite {
+    let proj = sprites.create(image.create(4, 4), SpriteKind.Projectile)
+    let colour = sprites.readDataNumber(sprite, "colour")
+    proj.image.fill(colour)
+    proj.setFlag(SpriteFlag.DestroyOnWall, true)
+    proj.setPosition(sprite.x, sprite.y)
+    return proj
+}
+
+controller.A.onEvent(ControllerButtonEvent.Pressed, function player_fire() {
+    fire(red).setVelocity(last_vx, last_vy)
+})
+function hit(player: Sprite, proj: Sprite) {
+    if (proj.image.getPixel(0, 0) == sprites.readDataNumber(player, "colour")) {
+        return
+    }
+    
+    player.sayText("!", 1000)
+    for (let i = 0; i < 100; i++) {
+        tiles.placeOnTile(player, player.tilemapLocation())
+        pause(10)
+    }
+    proj.destroy()
+}
+
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectile, hit)
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, hit)
+// 
 function change_opponent_dir(opponent: Sprite) {
     let y_vel: number;
     let x_vel: number;
@@ -72,6 +110,7 @@ scene.onPathCompletion(SpriteKind.Enemy, function on_path_completion(sprite: Spr
     change_opponent_dir(sprite)
 })
 function opponent_behaviour(opponent: Sprite) {
+    let proj: Sprite;
     let tile_image = sprites.readDataImage(opponent, "tile")
     tiles.setTileAt(opponent.tilemapLocation(), tile_image)
     if (randint(1, 50) == 1) {
@@ -80,9 +119,24 @@ function opponent_behaviour(opponent: Sprite) {
         target_tile_not_owned(opponent)
     }
     
+    // 
+    if (randint(1, 150) == 1) {
+        proj = fire(opponent)
+        proj.setVelocity(opponent.vx * 2, opponent.vy * 2)
+    }
+    
 }
 
+// 
 game.onUpdate(function tick() {
+    // 
+    
+    if (red.vx != 0 || red.vy != 0) {
+        last_vx = red.vx
+        last_vy = red.vy
+    }
+    
+    // 
     for (let opponent of sprites.allOfKind(SpriteKind.Enemy)) {
         opponent_behaviour(opponent)
     }
