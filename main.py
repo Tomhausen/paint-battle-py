@@ -5,18 +5,14 @@ green = sprites.create(assets.image("green player"), SpriteKind.enemy)
 sprites.set_data_image(red, "tile", assets.tile("red"))
 sprites.set_data_image(blue, "tile", assets.tile("blue"))
 sprites.set_data_image(green, "tile", assets.tile("green"))
-#
 sprites.set_data_number(red, "colour", 3)
 sprites.set_data_number(blue, "colour", 6)
 sprites.set_data_number(green, "colour", 9)
-#
 
 # variables
 opponent_speed = 75
-#
 last_vx = 100
 last_vy = 0
-#
 
 # setup
 info.start_countdown(120)
@@ -44,13 +40,13 @@ def time_up():
         game.over(False)
 info.on_countdown_end(time_up)
 
-#
 def fire(sprite: Sprite):
     proj = sprites.create(image.create(4, 4), SpriteKind.projectile)
     colour = sprites.read_data_number(sprite, "colour")
     proj.image.fill(colour)
     proj.set_flag(SpriteFlag.DESTROY_ON_WALL, True)
     proj.set_position(sprite.x, sprite.y)
+    proj.lifespan = 5000
     return proj
 
 def player_fire():
@@ -67,6 +63,17 @@ def hit(player, proj):
     proj.destroy()
 sprites.on_overlap(SpriteKind.player, SpriteKind.projectile, hit)
 sprites.on_overlap(SpriteKind.enemy, SpriteKind.projectile, hit)
+
+#
+def collect_star(player, star):
+    tile_image = sprites.read_data_image(player, "tile")
+    target_tiles = tilesAdvanced.get_adjacent_tiles(Shapes.SQUARE, star.tilemap_location(), 2)
+    for tile in target_tiles:
+        if not tiles.tile_at_location_is_wall(tile):
+            tiles.set_tile_at(tile, tile_image)
+    star.destroy()
+sprites.on_overlap(SpriteKind.player, SpriteKind.food, collect_star)
+sprites.on_overlap(SpriteKind.enemy, SpriteKind.food, collect_star)
 #
 
 def change_opponent_dir(opponent: Sprite):
@@ -104,24 +111,29 @@ def opponent_behaviour(opponent: Sprite):
         change_opponent_dir(opponent)
     elif randint(1, 50) == 1:
         target_tile_not_owned(opponent)
-    #
     if randint(1, 150) == 1:
         proj = fire(opponent)
         proj.set_velocity(opponent.vx * 2, opponent.vy * 2)
-    #
+
+#
+def spawn_star():
+    star = sprites.create(assets.image("star"), SpriteKind.food)
+    star.lifespan = 7500
+    random_tile = tilesAdvanced.get_all_tiles_where_wall_is(False)._pick_random()
+    tiles.place_on_tile(star, random_tile)
+    for opponent in sprites.all_of_kind(SpriteKind.enemy):
+        if randint(1, 5) == 1:
+            path = scene.a_star(opponent.tilemap_location(), star.tilemap_location())
+            scene.follow_path(opponent, path, opponent_speed)
+game.on_update_interval(10000, spawn_star)
+#
 
 def tick():
-    #
     global last_vx, last_vy
     if red.vx != 0 or red.vy != 0:
         last_vx = red.vx
         last_vy = red.vy
-    #
     for opponent in sprites.all_of_kind(SpriteKind.enemy):
         opponent_behaviour(opponent)
     tiles.set_tile_at(red.tilemap_location(), assets.tile("red"))
 game.on_update(tick)
-
-
-# stun mechanic
-# paint bomb

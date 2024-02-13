@@ -60,6 +60,25 @@ namespace myImages {
 . . . . . f f f f f f . . . . . 
 . . . . . f f . . f f . . . . . 
 `;
+            case "image4":
+            case "star":return img`
+. . . . . . . f f . . . . . . . 
+. . . . . . f 4 5 f . . . . . . 
+. . . . . f 4 5 7 9 f . . . . . 
+. . . . f f 5 7 9 8 f f . . . . 
+. . . . f 5 7 9 8 a 2 f . . . . 
+. f f f f 7 9 8 a 2 4 5 f f f . 
+f 2 4 5 7 9 8 a 2 4 5 7 9 8 a f 
+f 4 5 7 9 8 a 2 4 5 7 9 8 a 2 f 
+. f 7 9 8 a 2 4 5 7 9 8 a 2 f . 
+. . f 8 a 2 4 5 7 9 8 a 2 f . . 
+. . f a 2 4 5 7 9 8 a 2 4 f . . 
+. . f 2 4 5 7 9 8 a 2 4 5 f . . 
+. . f 4 5 7 f f f f 4 5 7 f . . 
+. . f 5 7 f . . . . f 7 9 f . . 
+. . f 7 9 f . . . . f 9 8 f . . 
+. . f f f . . . . . . f f f . . 
+`;
         }
         return null;
     })

@@ -14,6 +14,11 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "green player"
     },
+    "image4": {
+        "data": "hwQQABAAAAAAAAD/AAAAAAAA8EIPAAAAAADwVPf///8AAPB1iSpU9wDw/5eoQnX5AP91iSpU9w/wVJeoQnUPAE91iSpUlw8AX5eoQnWJDwDwiSpUl6gPAAD/QnWJKvQPAPBfl6hCdfkAAPCJKlSX+AAA8Kjy////AADwKg8AAAAAAAD/AAAAAA==",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "star"
+    },
     "*": {
         "mimeType": "image/x-mkcd-f4",
         "dataEncoding": "base64",

@@ -5,17 +5,13 @@ let green = sprites.create(assets.image`green player`, SpriteKind.Enemy)
 sprites.setDataImage(red, "tile", assets.tile`red`)
 sprites.setDataImage(blue, "tile", assets.tile`blue`)
 sprites.setDataImage(green, "tile", assets.tile`green`)
-// 
 sprites.setDataNumber(red, "colour", 3)
 sprites.setDataNumber(blue, "colour", 6)
 sprites.setDataNumber(green, "colour", 9)
-// 
 //  variables
 let opponent_speed = 75
-// 
 let last_vx = 100
 let last_vy = 0
-// 
 //  setup
 info.startCountdown(120)
 controller.moveSprite(red)
@@ -45,13 +41,13 @@ info.onCountdownEnd(function time_up() {
     }
     
 })
-// 
 function fire(sprite: Sprite): Sprite {
     let proj = sprites.create(image.create(4, 4), SpriteKind.Projectile)
     let colour = sprites.readDataNumber(sprite, "colour")
     proj.image.fill(colour)
     proj.setFlag(SpriteFlag.DestroyOnWall, true)
     proj.setPosition(sprite.x, sprite.y)
+    proj.lifespan = 5000
     return proj
 }
 
@@ -73,6 +69,21 @@ function hit(player: Sprite, proj: Sprite) {
 
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectile, hit)
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, hit)
+// 
+function collect_star(player: Sprite, star: Sprite) {
+    let tile_image = sprites.readDataImage(player, "tile")
+    let target_tiles = tilesAdvanced.getAdjacentTiles(Shapes.Square, star.tilemapLocation(), 2)
+    for (let tile of target_tiles) {
+        if (!tiles.tileAtLocationIsWall(tile)) {
+            tiles.setTileAt(tile, tile_image)
+        }
+        
+    }
+    star.destroy()
+}
+
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, collect_star)
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Food, collect_star)
 // 
 function change_opponent_dir(opponent: Sprite) {
     let y_vel: number;
@@ -119,7 +130,6 @@ function opponent_behaviour(opponent: Sprite) {
         target_tile_not_owned(opponent)
     }
     
-    // 
     if (randint(1, 150) == 1) {
         proj = fire(opponent)
         proj.setVelocity(opponent.vx * 2, opponent.vy * 2)
@@ -128,15 +138,28 @@ function opponent_behaviour(opponent: Sprite) {
 }
 
 // 
+game.onUpdateInterval(10000, function spawn_star() {
+    let path: tiles.Location[];
+    let star = sprites.create(assets.image`star`, SpriteKind.Food)
+    star.lifespan = 7500
+    let random_tile = tilesAdvanced.getAllTilesWhereWallIs(false)._pickRandom()
+    tiles.placeOnTile(star, random_tile)
+    for (let opponent of sprites.allOfKind(SpriteKind.Enemy)) {
+        if (randint(1, 5) == 1) {
+            path = scene.aStar(opponent.tilemapLocation(), star.tilemapLocation())
+            scene.followPath(opponent, path, opponent_speed)
+        }
+        
+    }
+})
+// 
 game.onUpdate(function tick() {
-    // 
     
     if (red.vx != 0 || red.vy != 0) {
         last_vx = red.vx
         last_vy = red.vy
     }
     
-    // 
     for (let opponent of sprites.allOfKind(SpriteKind.Enemy)) {
         opponent_behaviour(opponent)
     }

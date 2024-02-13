@@ -5,7 +5,7 @@
         "device": "*",
         "arcade-tilemap-a-star": "github:jwunderl/arcade-tilemap-a-star#v0.4.0",
         "arcade-sprite-util": "github:jwunderl/arcade-sprite-util#v0.4.1",
-        "Tiles Advanced": "github:tomhausen/the-code-zone-tiles-advanced#v0.5.4",
+        "Tiles Advanced": "github:tomhausen/the-code-zone-tiles-advanced#v0.5.6",
         "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.2.1"
     },
     "files": [
