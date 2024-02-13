@@ -67,8 +67,8 @@ sprites.on_overlap(SpriteKind.enemy, SpriteKind.projectile, hit)
 #
 def collect_star(player, star):
     tile_image = sprites.read_data_image(player, "tile")
-    target_tiles = tilesAdvanced.get_adjacent_tiles(Shapes.SQUARE, star.tilemap_location(), 2)
-    for tile in target_tiles:
+    local_tiles = tilesAdvanced.get_adjacent_tiles(Shapes.SQUARE, star.tilemap_location(), 2)
+    for tile in local_tiles:
         if not tiles.tile_at_location_is_wall(tile):
             tiles.set_tile_at(tile, tile_image)
     star.destroy()

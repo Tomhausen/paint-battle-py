@@ -72,8 +72,8 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Projectile, hit)
 // 
 function collect_star(player: Sprite, star: Sprite) {
     let tile_image = sprites.readDataImage(player, "tile")
-    let target_tiles = tilesAdvanced.getAdjacentTiles(Shapes.Square, star.tilemapLocation(), 2)
-    for (let tile of target_tiles) {
+    let local_tiles = tilesAdvanced.getAdjacentTiles(Shapes.Square, star.tilemapLocation(), 2)
+    for (let tile of local_tiles) {
         if (!tiles.tileAtLocationIsWall(tile)) {
             tiles.setTileAt(tile, tile_image)
         }
