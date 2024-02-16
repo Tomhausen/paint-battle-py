@@ -13,6 +13,7 @@ sprites.set_data_number(green, "colour", 9)
 opponent_speed = 75
 last_vx = 100
 last_vy = 0
+dash_len = 250
 
 # setup
 info.start_countdown(120)
@@ -52,6 +53,29 @@ def fire(sprite: Sprite):
 def player_fire():
     fire(red).set_velocity(last_vx, last_vy)
 controller.A.on_event(ControllerButtonEvent.PRESSED, player_fire)
+
+#
+def end_dash():
+    controller.move_sprite(red)
+    red.vx = 0
+    red.vy = 0
+
+def dash():
+    vx = red.vx
+    vy = red.vy
+    controller.move_sprite(red, 0 , 0)
+    red.start_effect(effects.ashes, dash_len)
+    red.vx = vx * 2.5
+    red.vy = vy * 2.5
+    timer.after(dash_len, end_dash)
+
+def throttle_dash():
+    timer.throttle("dash", 2000, dash)
+controller.combos.attach_combo("uu", throttle_dash)
+controller.combos.attach_combo("ll", throttle_dash)
+controller.combos.attach_combo("rr", throttle_dash)
+controller.combos.attach_combo("dd", throttle_dash)
+#
 
 def hit(player, proj):
     if proj.image.get_pixel(0, 0) == sprites.read_data_number(player, "colour"):

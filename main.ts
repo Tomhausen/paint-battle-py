@@ -12,6 +12,7 @@ sprites.setDataNumber(green, "colour", 9)
 let opponent_speed = 75
 let last_vx = 100
 let last_vy = 0
+let dash_len = 250
 //  setup
 info.startCountdown(120)
 controller.moveSprite(red)
@@ -54,6 +55,28 @@ function fire(sprite: Sprite): Sprite {
 controller.A.onEvent(ControllerButtonEvent.Pressed, function player_fire() {
     fire(red).setVelocity(last_vx, last_vy)
 })
+// 
+function throttle_dash() {
+    timer.throttle("dash", 2000, function dash() {
+        let vx = red.vx
+        let vy = red.vy
+        controller.moveSprite(red, 0, 0)
+        red.startEffect(effects.ashes, dash_len)
+        red.vx = vx * 2.5
+        red.vy = vy * 2.5
+        timer.after(dash_len, function end_dash() {
+            controller.moveSprite(red)
+            red.vx = 0
+            red.vy = 0
+        })
+    })
+}
+
+controller.combos.attachCombo("uu", throttle_dash)
+controller.combos.attachCombo("ll", throttle_dash)
+controller.combos.attachCombo("rr", throttle_dash)
+controller.combos.attachCombo("dd", throttle_dash)
+// 
 function hit(player: Sprite, proj: Sprite) {
     if (proj.image.getPixel(0, 0) == sprites.readDataNumber(player, "colour")) {
         return
